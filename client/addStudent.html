@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add Student</title>
+  </head>
+  <body>
+    <h1>Add A New Student</h1>
+
+    <br /><br />
+    ID:<input type="text" id="id" /><br /><br />
+    Full Name:<input type="text" id="name" /><br /><br />
+    Email:<input type="email" id="email" /><br /><br />
+    Faculty:<input type="text" id="faculty" /><br /><br />
+    Birth Date:<input type="date" id="birthDate" /><br /><br />
+
+    <button id="AddStudent" onclick="addStudent()">Add Student</button>
+  </body>
+  <script>
+    const url = "http://localhost:8000/students";
+
+    const idInput = document.getElementById("id");
+    const nameInput = document.getElementById("name");
+    const emailInput = document.getElementById("email");
+    const facultyInput = document.getElementById("faculty");
+    const dateInput = document.getElementById("birthDate");
+
+    const addStudent = async () => {
+      const newStudentObj = {
+        Id: idInput.value,
+        FullName: nameInput.value,
+        Email: emailInput.value,
+        Faculty: facultyInput.value,
+        BirthDate: dateInput.value,
+        Exams: [],
+      };
+
+      const response = await fetch(url, {
+        method: "post",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newStudentObj),
+      });
+
+      if (response.ok) {
+        window.location.href = "./Students.html";
+      } else {
+        alert("Error - addStudent failed");
+      }
+    };
+  </script>
+</html>

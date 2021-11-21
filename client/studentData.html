@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Data</title>
+  </head>
+  <body onload="studentInfo()">
+    <table id="table"></table>
+  </body>
+  <script>
+    const url = "http://localhost:8000/students";
+    const id = sessionStorage.getItem("id");
+
+    const tr = document.createElement("tr");
+
+    const thId = document.createElement("th");
+    thId.innerText = "ID";
+
+    const thName = document.createElement("th");
+    thName.innerText = "Name";
+
+    const thEmail = document.createElement("th");
+    thEmail.innerText = "Email";
+
+    const thFaculty = document.createElement("th");
+    thFaculty.innerText = "Faculty";
+
+    const thBirthDate = document.createElement("th");
+    thBirthDate.innerText = "Birth Date";
+
+    tr.appendChild(thId);
+    tr.appendChild(thName);
+    tr.appendChild(thEmail);
+    tr.appendChild(thFaculty);
+    tr.appendChild(thBirthDate);
+
+    table.appendChild(tr);
+
+    const studentInfo = async () => {
+      const table = document.getElementById("table");
+      table.border = "1";
+
+      const response = await fetch(`${url}/${id}`);
+
+      if (response.ok) {
+        const student = await response.json();
+
+        const tr = document.createElement("tr");
+
+        const tdId = document.createElement("td");
+        tdId.innerText = student.Id;
+
+        const tdName = document.createElement("td");
+        tdName.innerText = student.FullName;
+
+        const tdEmail = document.createElement("td");
+        tdEmail.innerText = student.Email;
+
+        const tdFaculty = document.createElement("td");
+        tdFaculty.innerText = student.Faculty;
+
+        const tdBirthDate = document.createElement("td");
+        const currentDate = new Date(student.BirthDate);
+        tdBirthDate.innerText = currentDate.toLocaleDateString("en-il");
+
+        tr.appendChild(tdId);
+        tr.appendChild(tdName);
+        tr.appendChild(tdEmail);
+        tr.appendChild(tdFaculty);
+        tr.appendChild(tdBirthDate);
+
+        table.appendChild(tr);
+      } else {
+        alert("Error - studentInfo failed");
+      }
+    };
+  </script>
+</html>

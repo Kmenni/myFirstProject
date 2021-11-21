@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Exams</title>
+  </head>
+  <body onload="getStudentExams()">
+    <table id="table"></table>
+    <br /><br />
+
+    Add/Edit EXAM: <br />
+
+    Name : <input id="name" type="text" value="" disabled /> <br />
+    Date: <input type="date" id="date" /><br />
+    Grade: <input type="number" min="0" max="100" id="grade" /> <br /><br />
+
+    <button id="updateExam" onclick="updateExam()">Update</button> &nbsp;
+    <button id="addExam" onclick="addExam()">Add Exam</button>
+  </body>
+  <script>
+    const url = "http://localhost:8000/students";
+    const id = sessionStorage.getItem("id");
+    const table = document.getElementById("table");
+    const nameInput = document.getElementById("name");
+    const dateInput = document.getElementById("date");
+    const gradeInput = document.getElementById("grade");
+    const addExamButton = document.getElementById("addExam");
+    const updateExamButton = document.getElementById("updateExam");
+    updateExamButton.disabled = true;
+
+    const getStudentExams = async () => {
+      const response = await fetch(`${url}/${id}`);
+
+      if (response.ok) {
+        const student = await response.json();
+
+        // full name is mandatory and must be the same in every exam.
+        nameInput.value = student.FullName;
+
+        document.getElementById("grade");
+
+        const tr = document.createElement("tr");
+
+        const thName = document.createElement("th");
+        thName.innerText = student.FullName;
+
+        const thDate = document.createElement("th");
+        thDate.innerText = "Date";
+
+        const thGrade = document.createElement("th");
+        thGrade.innerText = "Grade";
+
+        tr.appendChild(thName);
+        tr.appendChild(thDate);
+        tr.appendChild(thGrade);
+
+        table.appendChild(tr);
+        table.border = "1";
+
+        student.Exams.map((exam) => {
+          const tr = document.createElement("tr");
+
+          const tdName = document.createElement("td");
+          tdName.innerText = exam.Name;
+
+          const tdDate = document.createElement("td");
+          const currentDate = new Date(exam.Date);
+          tdDate.innerText = currentDate.toLocaleDateString("en-il");
+
+          const tdGrade = document.createElement("td");
+          tdGrade.innerText = exam.Grade;
+
+          const tdEdit = document.createElement("td");
+          const editButton = document.createElement("button");
+          editButton.innerText = "Edit Exam";
+          editButton.onclick = () => {
+            examId(exam._id);
+            const examDate = new Date(exam.Date);
+            dateInput.value = examDate.toLocaleDateString("fr-CA");
+            gradeInput.value = exam.Grade;
+            addExamButton.disabled = true;
+            updateExamButton.disabled = false;
+          };
+          tdEdit.appendChild(editButton);
+
+          tr.appendChild(tdName);
+          tr.appendChild(tdDate);
+          tr.appendChild(tdGrade);
+          tr.appendChild(tdEdit);
+          table.appendChild(tr);
+        });
+      }
+    };
+
+    const updateExam = async () => {
+      const examId = sessionStorage.getItem("examId");
+      const updatedExamObj = {
+        Name: nameInput.value,
+        Date: dateInput.value,
+        Grade: gradeInput.value,
+      };
+      const response = await fetch(`${url}/${id}/${examId}`, {
+        method: "put",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedExamObj),
+      });
+
+      if (response.ok) {
+        window.location.href = "./studentExams.html";
+      } else {
+        alert("updating an exam failed");
+      }
+    };
+
+    const addExam = async () => {
+      const newExamObj = {
+        Name: nameInput.value,
+        Date: dateInput.value,
+        Grade: gradeInput.value,
+      };
+      const response = await fetch(`${url}/${id}`, {
+        method: "post",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newExamObj),
+      });
+      if (response.ok) {
+        window.location.href = "./studentExams.html";
+      } else {
+        alert("adding an exam failed");
+      }
+    };
+
+    const examId = (id) => {
+      sessionStorage.setItem("examId", id);
+    };
+  </script>
+</html>

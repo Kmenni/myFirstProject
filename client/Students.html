@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Students</title>
+  </head>
+  <body onload="getAllStudents()">
+    <table id="table"></table>
+    <br /><br />
+
+    <button onclick="window.location.href = `./addStudent.html`">
+      Add Student
+    </button>
+  </body>
+  <script>
+    const url = "http://localhost:8000/students";
+
+    const tr = document.createElement("tr");
+
+    const thId = document.createElement("th");
+    thId.innerText = "ID";
+
+    const thName = document.createElement("th");
+    thName.innerText = "Name";
+
+    const thFaculty = document.createElement("th");
+    thFaculty.innerText = "Faculty";
+
+    tr.appendChild(thId);
+    tr.appendChild(thName);
+    tr.appendChild(thFaculty);
+
+    table.appendChild(tr);
+
+    const getAllStudents = async () => {
+      const table = document.getElementById("table");
+      table.border = "1";
+
+      const response = await fetch(url);
+
+      if (response.ok) {
+        const students = await response.json();
+
+        students.map((student) => {
+          const tr = document.createElement("tr");
+
+          const tdId = document.createElement("td");
+          tdId.innerText = student.Id;
+
+          const tdName = document.createElement("td");
+          const nameLink = document.createElement("a");
+          nameLink.innerText = student.FullName;
+          nameLink.onclick = () => studentId(student._id);
+          nameLink.href = "./studentData.html";
+          tdName.appendChild(nameLink);
+
+          const tdFaculty = document.createElement("td");
+          tdFaculty.innerText = student.Faculty;
+
+          const tdExams = document.createElement("td");
+          const examsLink = document.createElement("a");
+          examsLink.innerText = "Exams";
+          examsLink.onclick = () => studentId(student._id);
+          examsLink.href = "./studentExams.html";
+          tdExams.appendChild(examsLink);
+
+          const tdEdit = document.createElement("td");
+          const editLink = document.createElement("a");
+          editLink.innerText = "Edit Student";
+          editLink.onclick = () => studentId(student._id);
+          editLink.href = "./updateStudent.html";
+          tdEdit.appendChild(editLink);
+
+          const tdDelete = document.createElement("td");
+          const deleteButton = document.createElement("button");
+          deleteButton.innerText = "Delete Student";
+          deleteButton.onclick = () => deleteStudent(student._id);
+          tdDelete.appendChild(deleteButton);
+
+          tr.appendChild(tdId);
+          tr.appendChild(tdName);
+          tr.appendChild(tdFaculty);
+          tr.appendChild(tdExams);
+          tr.appendChild(tdEdit);
+          tr.appendChild(tdDelete);
+          table.appendChild(tr);
+        });
+      } else {
+        alert("Error - getAllStudents failed");
+      }
+    };
+
+    const studentId = (id) => {
+      sessionStorage.setItem("id", id);
+    };
+
+    const deleteStudent = async (id) => {
+      const response = await fetch(`${url}/${id}`, { method: "delete" });
+
+      if (response.ok) {
+        window.location.href = "./Students.html";
+      } else {
+        alert("Error - deleteStudent failed");
+      }
+    };
+  </script>
+</html>

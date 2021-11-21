@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Update Student</title>
+  </head>
+  <body onload="getStudentInfo()">
+    <h1>Update Student</h1>
+    <br /><br />
+    ID:<input type="text" id="id" /><br /><br />
+    Full Name:<input type="text" id="name" /><br /><br />
+    Email:<input type="email" id="email" /><br /><br />
+    Faculty:<input type="text" id="faculty" /><br /><br />
+    Birth Date:<input type="date" id="birthDate" /><br /><br />
+
+    <button id="update" onclick="updateInfo()">Update</button>
+  </body>
+  <script>
+    const url = "http://localhost:8000/students";
+    const id = sessionStorage.getItem("id");
+
+    const idInput = document.getElementById("id");
+    const nameInput = document.getElementById("name");
+    const emailInput = document.getElementById("email");
+    const facultyInput = document.getElementById("faculty");
+    const dateInput = document.getElementById("birthDate");
+
+    const getStudentInfo = async () => {
+      const response = await fetch(`${url}/${id}`);
+
+      if (response.ok) {
+        const student = await response.json();
+        console.log(student);
+        idInput.value = student.Id;
+        nameInput.value = student.FullName;
+        emailInput.value = student.Email;
+        facultyInput.value = student.Faculty;
+
+        const birthDate = new Date(student.BirthDate);
+        console.log(student.BirthDate);
+        console.log(birthDate.toLocaleDateString("fr-CA"));
+        dateInput.value = birthDate.toLocaleDateString("fr-CA");
+      } else {
+        alert("Error - getStudentInfo failed");
+      }
+    };
+
+    const updateInfo = async () => {
+      const updatedStudentObj = {
+        Id: idInput.value,
+        FullName: nameInput.value,
+        Email: emailInput.value,
+        Faculty: facultyInput.value,
+        BirthDate: dateInput.value,
+      };
+
+      const response = await fetch(`${url}/${id}`, {
+        method: "put",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedStudentObj),
+      });
+
+      if (response.ok) {
+        const student = await response.json();
+        window.location.href = "./Students.html";
+      } else {
+        alert("Error - updateInfo failed");
+      }
+    };
+  </script>
+</html>
